@@ -29,6 +29,14 @@ class FlipAnimator extends Animator {
   constructor(canvasElement: HTMLCanvasElement) {
     super(canvasElement)
 
+    // Set up scene, renderer, & camera
+    this.scene = new THREE.Scene()
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    this.camera.position.set(0, 0, 0);
+
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvasElement })
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+
     // Define tweens and next tween
     const coordSequence: xyz[] = [
       {x: 0, y: 0, z: 0},
@@ -38,27 +46,16 @@ class FlipAnimator extends Animator {
     this.nextTweenIndex = 0
     this.tweens = []
 
-    coordSequence.forEach((coords, i) => {
+    coordSequence.forEach((_, i) => {
       const nextCoords = coordSequence[(i+1) % coordSequence.length]
       this.tweens.push(
-        new TWEEN.Tween(coords)
+        new TWEEN.Tween(this.camera.rotation)
           .to(nextCoords)
-          .onUpdate((val) => {
-            this.camera.rotation.set(val.x, val.y, val.z)
-          })
           .easing(TWEEN.Easing.Back.InOut) // TODO: Look at using interpolation instead of easing???
       )
     })
 
     console.log(this.tweens)
-
-    // Set up scene, renderer, & camera
-    this.scene = new THREE.Scene()
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    this.camera.position.set(0, 0, 0);
-
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvasElement })
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
 
     // Set up box 1
     const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
@@ -68,7 +65,7 @@ class FlipAnimator extends Animator {
     this.scene.add(this.cube)
 
     // Set up plane 1
-    const imageTexture = new THREE.TextureLoader().load('http://placekitten.com/400/200')
+    const imageTexture = new THREE.TextureLoader().load('http://placekitten.com/200/200')
 
     var imageMaterial = new THREE.MeshBasicMaterial({map: imageTexture});
     if (imageMaterial.map) {
@@ -78,7 +75,7 @@ class FlipAnimator extends Animator {
     this.setupPlaneOfImages(
       5,
       imageMaterial,
-      {x: 2, y: 1},
+      {x: 1, y: 1},
       {x: 0, y: 0, z: -3},
       {x: 0, y: 0, z: 0}
     )
@@ -86,7 +83,7 @@ class FlipAnimator extends Animator {
     this.setupPlaneOfImages(
       5,
       imageMaterial,
-      {x: 2, y: 1},
+      {x: 1, y: 1},
       {x: 0, y: 0, z: 3},
       {x: 0, y: Math.PI, z: 0}
     )
@@ -102,10 +99,10 @@ class FlipAnimator extends Animator {
     planeCoords: {x: number, y: number, z: number},
     planeRotation: {x: number, y: number, z: number}
   ) {
-    const xPadding = 1
-    const yPadding = 1
-    const xOffset = -((gridSize * imageSize.x) + ((gridSize - 1) * xPadding))/2
-    const yOffset = -((gridSize * imageSize.y) + ((gridSize - 1) * yPadding))/2
+    const xPadding = .1
+    const yPadding = .1
+    const xOffset = -((gridSize - 1) * (imageSize.x + xPadding))/2
+    const yOffset = -((gridSize - 1) * (imageSize.y + yPadding))/2
 
     for (var i = 0; i < gridSize; i++) {
       for (var j = 0; j < gridSize; j++) {

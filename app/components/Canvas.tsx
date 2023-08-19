@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { ANIMATION_TYPE_TO_ANIMATOR_CLASS } from "../globalConstants";
 import { animationType } from "../globalTypes";
-import ParticleAnimator from '../animations/particles/ParticleAnimator'
 import { Animator } from "../animations/Animator";
 
 interface CanvasProps {
